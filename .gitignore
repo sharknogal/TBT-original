@@ -1,0 +1,62 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Local tooling
+.omx/
+.vs/
+.vscode/
+.idea/
+
+# Unity generated project files
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Crash and build artifacts
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+
+# Third-party asset packs are excluded from the public portfolio repository.
+# Import them locally if the original visuals or audio are needed.
+Assets/PolygonPrototype/
+Assets/PolygonPrototype.meta
+Assets/RegularImpactsSFX/
+Assets/RegularImpactsSFX.meta
+Assets/Weapons of Choice FREE - Komposite Sound/
+Assets/Weapons of Choice FREE - Komposite Sound.meta
+Assets/TutorialInfo/
+Assets/TutorialInfo.meta
+Assets/Readme.asset
+Assets/Readme.asset.meta
+
+# Source animation and audio binaries with unclear redistribution terms
+Assets/Animations/*.fbx
+Assets/Animations/*.fbx.meta
+Assets/Sounds/
+Assets/Sounds.meta
