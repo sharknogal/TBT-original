@@ -6,7 +6,7 @@
 
 [GitHub Repository](https://github.com/sharknogal/TBT-original)
 
-> **Last Updated**: 2026.06.07 | **Unity**: 6000.3.3f1 | **Status**: Portfolio Snapshot
+> **Last Updated**: 2026.06.08 | **Unity**: 6000.3.3f1 | **Status**: Portfolio Snapshot
 
 ---
 
@@ -14,7 +14,7 @@
 
 - **Grid 기반 전술 맵**: `GridSystem<T>`를 기반으로 월드 좌표와 그리드 좌표를 변환하고, 유닛 점유 상태와 상호작용 오브젝트를 관리합니다.
 - **모듈형 액션 구조**: `BaseAction`을 상속한 Move, Shoot, Sword, Grenade, Spin, Interact 액션으로 전투 행동을 분리했습니다.
-- **A* Pathfinding**: 장애물 레이어를 기준으로 이동 가능 노드를 계산하고, 이동 액션에서 실제 경로를 따라 유닛을 이동시킵니다.
+- **Grid 기반 경로 이동**: 장애물 레이어와 노드 이동 가능 여부를 기준으로 이동 가능 칸을 계산하고, 이동 액션에서 실제 경로를 따라 유닛을 이동시킵니다.
 - **턴/액션 포인트 시스템**: 플레이어 턴과 적 턴을 전환하며, 각 유닛은 턴 시작 시 액션 포인트를 회복합니다.
 - **점수 기반 Enemy AI**: 각 액션이 후보 위치별 가치를 계산하고, 적 AI가 가장 높은 점수의 행동을 선택합니다.
 - **시야/사거리 판정**: 사격 액션은 거리, 적/아군 여부, 장애물 Raycast를 함께 검사해 유효 타겟을 필터링합니다.
@@ -203,12 +203,12 @@ public abstract class BaseAction : MonoBehaviour
 
 ---
 
-### 2.3 A* Pathfinding 이동 시스템
+### 2.3 Grid 기반 경로 이동 시스템
 
 | 구분 | 내용 |
 |------|------|
 | **문제** | 단순 거리 기반 이동은 벽, 문, 크레이트 같은 장애물을 우회하지 못합니다. |
-| **해결** | `Pathfinding`이 별도의 `GridSystem<PathNode>`를 만들고, 장애물 Raycast로 이동 불가능한 노드를 표시한 뒤 A*로 경로를 탐색합니다. |
+| **해결** | `Pathfinding`이 별도의 `GridSystem<PathNode>`를 만들고, 장애물 Raycast로 이동 불가능한 노드를 표시한 뒤 비용 기반으로 이동 경로를 계산합니다. |
 | **결과** | `MoveAction`은 최종 목적지만 받더라도 실제 이동 가능한 경로를 따라 부드럽게 이동합니다. |
 
 #### 도식
@@ -218,7 +218,7 @@ flowchart TD
     Setup["Pathfinding.Setup"] --> Scan["Obstacle Raycast Scan"]
     Scan --> Nodes["PathNode Walkable Map"]
     Move["MoveAction.TakeAction"] --> Find["FindPath(start, end)"]
-    Find --> Open["Open List / Lowest F Cost"]
+    Find --> Open["Candidate Nodes / Lowest Cost"]
     Open --> Path["Calculated Grid Path"]
     Path --> World["Convert to World Positions"]
     World --> MoveUnit["Move unit along path"]
@@ -338,7 +338,7 @@ if (Physics.Raycast(
 
 **시스템 특징**
 
-- `MoveAction`은 A* 경로를 받아 월드 좌표 리스트로 변환합니다.
+- `MoveAction`은 계산된 그리드 경로를 받아 월드 좌표 리스트로 변환합니다.
 - 유닛은 경로의 각 지점을 순서대로 이동하며 방향을 보간합니다.
 - 이동 가능한 칸은 점유 상태, 장애물, 경로 존재 여부, 최대 이동 거리로 필터링됩니다.
 - `LevelGrid.OnAnyUnitMovedGridPosition` 이벤트로 그리드 시각화가 자동 갱신됩니다.
@@ -348,8 +348,8 @@ if (Physics.Raycast(
 | 컴포넌트 | 역할 |
 |----------|------|
 | `MoveAction` | 이동 가능 칸 계산 및 경로 이동 실행 |
-| `Pathfinding` | A* 경로 탐색 및 장애물 노드 관리 |
-| `PathNode` | G/H/F 비용과 이전 노드 저장 |
+| `Pathfinding` | 그리드 경로 계산 및 장애물 노드 관리 |
+| `PathNode` | 이동 비용과 이전 노드 저장 |
 | `GridSystemVisual` | 선택 액션의 유효 칸 표시 |
 
 ---
